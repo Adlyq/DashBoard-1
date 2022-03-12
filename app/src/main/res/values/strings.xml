@@ -2,6 +2,7 @@
     <string name="app_name">DashBoard</string>
     <string name="title_ip_check">IP 检查</string>
     <string name="title_speed_test">网络测速</string>
+    <string name="title_config">配  置</string>
     <string name="title_web_dashboard">网页面板</string>
     <string name="clash_enable">Clash 运行正常</string>
     <string name="clash_disable">Clash 已停止</string>

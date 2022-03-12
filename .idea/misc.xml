@@ -33,6 +33,8 @@
         <entry key="app/src/main/res/layout-land/fragment_ip_check_page.xml" value="0.25" />
         <entry key="app/src/main/res/layout-land/fragment_main_page.xml" value="0.22" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.24864130434782608" />
+        <entry key="app/src/main/res/layout/fragment_config_page_item.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/fragment_config_page_list.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_download_page.xml" value="0.19427083333333334" />
         <entry key="app/src/main/res/layout/fragment_ip_check_page.xml" value="0.35052083333333334" />
         <entry key="app/src/main/res/layout/fragment_ip_check_page_ip.xml" value="0.3494791666666667" />

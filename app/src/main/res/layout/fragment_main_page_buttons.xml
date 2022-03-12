@@ -119,4 +119,24 @@
                 android:textAppearance="?attr/textAppearanceHeadline6" />
         </androidx.appcompat.widget.LinearLayoutCompat>
     </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/menu_config"
+        style="@style/DefaultCard"
+        app:cardElevation="0dp">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            style="@style/Default"
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                style="@style/DefaultCardImage"
+                android:src="@drawable/ic_speed" />
+
+            <TextView style="@style/DefaultCardText"
+                android:text="@string/title_config"
+                android:textAppearance="?attr/textAppearanceHeadline6" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </com.google.android.material.card.MaterialCardView>
 </androidx.appcompat.widget.LinearLayoutCompat>

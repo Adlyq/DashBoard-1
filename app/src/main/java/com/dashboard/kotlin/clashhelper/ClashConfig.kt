@@ -9,8 +9,6 @@ import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 
-
-@DelicateCoroutinesApi
 object ClashConfig {
 
     var paths: List<String>
@@ -71,6 +69,7 @@ object ClashConfig {
         getFromFile("$GExternalCacheDir/template", arrayOf("secret"))
     }
 
+    @DelicateCoroutinesApi
     fun updateConfig(callBack: (r: String) -> Unit) {
         runCatching {
             mergeConfig("config_output.yaml")
@@ -95,6 +94,7 @@ object ClashConfig {
             callBack("配置文件有误唉")
     }
 
+    @DelicateCoroutinesApi
     private fun updateConfigNet(configPath: String, callBack: (r: String) -> Unit) {
         GlobalScope.launch(Dispatchers.IO) {
             try {

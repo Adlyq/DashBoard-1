@@ -103,6 +103,10 @@ class MainPage : Fragment(), androidx.appcompat.widget.Toolbar.OnMenuItemClickLi
             it.findNavController().navigate(R.id.action_mainPage_to_ipCheckPage)
         }
 
+        menu_config.setOnClickListener {
+            it.findNavController().navigate(R.id.action_mainPage_to_configPage)
+        }
+
         menu_web_dashboard.setOnClickListener {
             val bundle = Bundle()
             bundle.putString("URL", "${ClashConfig.baseURL}/ui/" +

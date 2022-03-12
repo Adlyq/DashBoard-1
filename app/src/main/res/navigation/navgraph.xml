@@ -16,10 +16,16 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-
         <action
             android:id="@+id/action_mainPage_to_ipCheckPage"
             app:destination="@id/ipCheckPage"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_mainPage_to_configPage"
+            app:destination="@id/configPage"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -35,4 +41,12 @@
         android:name="com.dashboard.kotlin.IpCheckPage"
         android:label="fragment_ip_check_page"
         tools:layout="@layout/fragment_ip_check_page" />
+    <fragment
+        android:id="@+id/configPage"
+        android:name="com.dashboard.kotlin.ConfigPage"
+        android:label="fragment_config_page"
+        tools:layout="@layout/fragment_config_page_list">
+
+    </fragment>
+
 </navigation>
