@@ -17,7 +17,7 @@
         <item name="android:clickable">true</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginTop">8dp</item>
         <item name="android:layout_marginStart">18dp</item>
         <item name="android:layout_marginEnd">18dp</item>
         <item name="cardCornerRadius">10dp</item>
@@ -34,8 +34,8 @@
     <style name="DefaultCardText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingTop">21dp</item>
-        <item name="android:paddingBottom">21dp</item>
+        <item name="android:paddingTop">15dp</item>
+        <item name="android:paddingBottom">15dp</item>
         <item name="android:textSize">18sp</item>
     </style>
 

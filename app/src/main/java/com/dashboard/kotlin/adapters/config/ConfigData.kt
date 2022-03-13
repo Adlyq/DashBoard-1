@@ -43,9 +43,9 @@ data class ConfigYaml(
     )
 
     fun addSubscripts(name: String, url: String){
-        if (name.replace(" ", "") == "") return
+        if (name.replace(" ", "").isEmpty()) return
         `proxy-providers`[name] = Proxy(
-            if (url != "") "http" else "file",
+            if (url.isNotEmpty()) "http" else "file",
             url,
             "./proxy_providers/$name.yaml",
             "3600",

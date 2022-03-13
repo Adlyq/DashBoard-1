@@ -19,7 +19,7 @@ object ClashConfig {
         SuiHelper.suCmd(
             "mkdir -p $dataPath/run &&" +
                     "cp -f $dataPath/clash.config $dataPath/run/c.cfg &&" +
-                    " echo '\necho \"\${Clash_bin_path};\${Clash_scripts_dir};\"'" +
+                    " echo '\necho \"\${Clash_bin_path};\${Clash_scripts_dir};\${auto_updateSubcript};\"'" +
                     " >> $dataPath/run/c.cfg")
         paths = SuiHelper.suCmd("$dataPath/run/c.cfg").split(';')
         SuiHelper.suCmd("rm -f $dataPath/run/c.cfg")
@@ -38,6 +38,12 @@ object ClashConfig {
         runCatching {
             if (paths[1] == "") throw Error() else paths[1]
         }.getOrDefault( "/data/clash/scripts")
+    }
+
+    val isUseProviders by lazy {
+        runCatching {
+            if (paths[2] == "") throw Error() else paths[2]=="false"
+        }.getOrDefault( false)
     }
 
     val mergedConfigPath

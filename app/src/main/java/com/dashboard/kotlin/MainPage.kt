@@ -106,6 +106,7 @@ class MainPage : Fragment(), androidx.appcompat.widget.Toolbar.OnMenuItemClickLi
         menu_config.setOnClickListener {
             it.findNavController().navigate(R.id.action_mainPage_to_configPage)
         }
+        menu_config.visibility = if (ClashConfig.isUseProviders) View.VISIBLE else View.GONE
 
         menu_web_dashboard.setOnClickListener {
             val bundle = Bundle()
