@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -34,51 +35,26 @@ class ConfigPage : Fragment() {
         return inflater.inflate(R.layout.fragment_config_page_list, container, false)
     }
 
+    lateinit var data: ConfigYaml
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         lifecycleScope.launch(Dispatchers.IO){
             val oData = Regex("(?<= )https?://[^ '\"\n]*(?=[\n ])").replace(SuiHelper.suCmd(
                 "sed -n -E '/^proxies:.*\$/,\$p' ${ClashConfig.configPath}"
             ), " '\$0'")
-            Log.d("TEST", oData)
-            val data = Yaml.decodeFromString(
+            //Log.d("TEST", oData)
+            data = Yaml.decodeFromString(
                 ConfigYaml.serializer(),
                 oData
             )
             config_toolbar.setOnMenuItemClickListener {
                 when (it.itemId){
                     R.id.menu_subscript_add -> {
-                        val plane = EditText(context).apply {
-                            hint = "机场名"
-                        }
-                        val url = EditText(context).apply {
-                            hint = "订阅链接"
-                        }
-                        AlertDialog.Builder(context).apply {
-                            setTitle("Edit")
-                            setView(LinearLayout(context).apply {
-                                orientation = LinearLayout.VERTICAL
-                                addView(plane)
-                                addView(url)
-                            })
-                            setNegativeButton("Cancel", null)
-                            setPositiveButton("Ok"){ _, _ ->
-                                data.addSubscripts(plane.text.toString(), url.text.toString())
-                            }
-                        }.show()
+                        dialogShow()
                         true
                     }
                     R.id.menu_config_save ->{
-                        runCatching {
-                            File(GExternalCacheDir, "out_config.yaml").outputStream().use { op ->
-                                op.write(Yaml.encodeToString(data).toByteArray())
-                            }
-                            SuiHelper.suCmd("mv -f ${ClashConfig.configPath} ${ClashConfig.configPath}.o")
-                            SuiHelper.suCmd("cp -f $GExternalCacheDir/out_config.yaml ${ClashConfig.configPath}")
-                        }.onSuccess {
-                            Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
-                        }.onFailure {
-                            Toast.makeText(context, "Failure", Toast.LENGTH_SHORT).show()
-                        }
+                        saveFile()
                         true
                     }
                     else ->
@@ -89,28 +65,8 @@ class ConfigPage : Fragment() {
                 list_view.apply {
                     layoutManager = LinearLayoutManager(context)
 
-                    adapter = ConfigRecyclerAdapter(data){
-                        val plane = EditText(context).apply {
-                            hint = "机场名"
-                            setText(it[0])
-                        }
-                        val url = EditText(context).apply {
-                            hint = "订阅链接"
-                            setText(it[1])
-                        }
-                        AlertDialog.Builder(context).apply {
-                            setTitle("Edit")
-                            setView(LinearLayout(context).apply {
-                                orientation = LinearLayout.VERTICAL
-                                addView(plane)
-                                addView(url)
-                            })
-                            setNegativeButton("Cancel", null)
-                            setPositiveButton("Ok"){ _, _ ->
-                                it[0] = plane.text.toString()
-                                it[1] = url.text.toString()
-                            }
-                        }.show()
+                    adapter = ConfigRecyclerAdapter(data){ lst, cb ->
+                        dialogShow(lst){ cb(it) }
                     }
                     ItemTouchHelper(
                         ConfigAdapterCallback(
@@ -119,6 +75,58 @@ class ConfigPage : Fragment() {
                     ).attachToRecyclerView(this)
                 }
             }
+        }
+    }
+
+    private fun dialogShow(item: MutableList<String>? = null, onOk: ((List<String>)->Unit)? = null){
+        val plane = EditText(context).apply {
+            hint = "机场名"
+            if (item != null) {
+                setText(item[0])
+            }
+        }
+        val url = EditText(context).apply {
+            hint = "订阅链接"
+            if (item != null) {
+                setText(item[1])
+            }
+        }
+        AlertDialog.Builder(context).apply {
+            setTitle("Edit")
+            setView(LinearLayout(context).apply {
+                orientation = LinearLayout.VERTICAL
+                addView(plane)
+                addView(url)
+            })
+            setNegativeButton("Cancel", null)
+            setPositiveButton("Ok"){ _, _ ->
+                if (item != null) {
+                    item[0] = plane.text.toString()
+                    item[1] = url.text.toString()
+                    onOk?.invoke(item)
+                }else{
+                    data.addSubscripts(plane.text.toString(), url.text.toString())
+                }
+            }
+        }.show()
+    }
+
+    fun saveFile(){
+        runCatching {
+            File(GExternalCacheDir, "out_config.yaml").outputStream().use { op ->
+                op.write(Yaml.encodeToString(ConfigYaml.serializer(), data).toByteArray())
+            }
+            SuiHelper.suCmd("mv -f ${ClashConfig.configPath} ${ClashConfig.configPath}.o")
+            SuiHelper.suCmd("cp -f $GExternalCacheDir/out_config.yaml ${ClashConfig.configPath}")
+        }.onSuccess {
+            Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+        }.onFailure {
+            Toast.makeText(context, "Failure", Toast.LENGTH_SHORT).show()
+            AlertDialog.Builder(context).apply {
+                setView(TextView(context).apply {
+                    text = it.message
+                })
+            }.show()
         }
     }
 

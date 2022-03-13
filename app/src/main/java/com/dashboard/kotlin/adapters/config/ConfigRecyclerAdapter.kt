@@ -1,5 +1,6 @@
 package com.dashboard.kotlin.adapters.config
 
+import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,7 +9,7 @@ import com.dashboard.kotlin.databinding.FragmentConfigPageItemBinding
 
 class ConfigRecyclerAdapter(
     val values: ConfigYaml,
-    private val onClick: (MutableList<String>)->Unit
+    private val onClick: (MutableList<String>, (List<String>)->Unit)-> Unit
 ) : RecyclerView.Adapter<ConfigRecyclerAdapter.ViewHolder>(), ConfigAdapterCallback.TouchListener {
     private val mKeysP
         get() = mData.keys.toList()
@@ -29,17 +30,21 @@ class ConfigRecyclerAdapter(
         )
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.idView.text = position.toString()
         val key = mKeysP[position]
+        holder.idView.text = position.toString()
         holder.contentView.text = key
-        val data = mutableListOf(mKeysP[position],
-            mData[key]?.url.toString())
+
         holder.root.setOnClickListener {
-            onClick(data)
-            if (key != data[0]){
-                mData.remove(key)
-            }else
-                mData[data[0]]?.url = data[1]
+            val data = mutableListOf(key, mData[key]?.url.toString())
+            onClick(data){
+                if (key != data[0]) {
+                    mData.remove(key)
+                    values.addSubscripts(data[0], data[1])
+                } else {
+                    mData[data[0]]?.url = data[1]
+                }
+                notifyDataSetChanged()
+            }
         }
         holders.add(holder)
     }

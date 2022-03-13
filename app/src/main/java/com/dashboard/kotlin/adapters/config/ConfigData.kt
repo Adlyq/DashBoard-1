@@ -1,6 +1,7 @@
 package com.dashboard.kotlin.adapters.config
 
 import android.util.Log
+import androidx.annotation.Keep
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
@@ -21,14 +22,14 @@ data class ConfigYaml(
         val type: String,
         var url: String= "",
         val path: String,
-        val interval: Int,
+        val interval: String,
         val `health-check`: HealthCheck?
     ){
         @Serializable
         data class HealthCheck(
             val enable: Boolean,
             val url: String,
-            val interval: Int
+            val interval: String
         )
     }
 
@@ -47,7 +48,7 @@ data class ConfigYaml(
             if (url != "") "http" else "file",
             url,
             "./proxy_providers/$name.yaml",
-            3600,
+            "3600",
             null
         )
 
@@ -80,16 +81,18 @@ data class ConfigYaml(
     fun deleteSubscript(name: String){
         if (name.replace(" ", "") == "") return
         `proxy-providers`.remove(name)
+
+        var group: Group? =null
         `proxy-groups`.forEach {
-            Log.e("TEST", "deleteSubscript: ${it.name}", )
             when (it.name) {
                 "Proxy" -> {
                     it.proxies.remove(name)
                 }
-                name -> {
-                    `proxy-groups`.remove(it)
-                }
+                name ->
+                    group = it
             }
         }
+        `proxy-groups`.remove(group)
+
     }
 }
