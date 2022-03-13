@@ -153,10 +153,10 @@ class MainPage : Fragment(), androidx.appcompat.widget.Toolbar.OnMenuItemClickLi
                 handler.post{
                     runCatching {
                         when {
-                            clashStatusClass.runStatus() ->
-                                setStatusRunning()
                             CommandHelper.isCmdRunning() ->
                                 setStatusCmdRunning()
+                            clashStatusClass.runStatus() ->
+                                setStatusRunning()
                             else ->
                                 setStatusStopped()
                         }

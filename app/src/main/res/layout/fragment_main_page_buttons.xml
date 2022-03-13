@@ -132,7 +132,7 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 style="@style/DefaultCardImage"
-                android:src="@drawable/ic_speed" />
+                android:src="@drawable/ic_setting" />
 
             <TextView style="@style/DefaultCardText"
                 android:text="@string/title_config"

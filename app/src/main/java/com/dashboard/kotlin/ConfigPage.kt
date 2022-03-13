@@ -1,24 +1,29 @@
 package com.dashboard.kotlin
 
+import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.dashboard.kotlin.adapters.config.ConfigAdapterCallback
-import com.dashboard.kotlin.adapters.config.ConfigData
 import com.dashboard.kotlin.adapters.config.ConfigRecyclerAdapter
+import com.dashboard.kotlin.adapters.config.ConfigYaml
 import com.dashboard.kotlin.clashhelper.ClashConfig
-import com.dashboard.kotlin.placeholder.PlaceholderContent
 import com.dashboard.kotlin.suihelper.SuiHelper
 import kotlinx.android.synthetic.main.fragment_config_page_list.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.mamoe.yamlkt.Yaml
-import net.mamoe.yamlkt.YamlElement
+import java.io.File
 
 class ConfigPage : Fragment() {
 
@@ -30,21 +35,90 @@ class ConfigPage : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        list_view.apply {
-            layoutManager = LinearLayoutManager(context)
-            ConfigData(Yaml.decodeYamlFromString(
-                SuiHelper.suCmd(
-                    "sed -n -E '/^proxies:.*\$/,\$p' ${ClashConfig.configPath}"
-                )
-            ))
-            adapter = ConfigRecyclerAdapter(PlaceholderContent.ITEMS){
-                Toast.makeText(context, "$it", Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch(Dispatchers.IO){
+            val oData = Regex("(?> )(https?://[^ '\"\n]*)(?=[\n ])").replace(SuiHelper.suCmd(
+                "sed -n -E '/^proxies:.*\$/,\$p' ${ClashConfig.configPath}"
+            ), " '\$1'")
+            Log.d("TEST", oData)
+            val data = Yaml.decodeFromString(
+                ConfigYaml.serializer(),
+                oData
+            )
+            config_toolbar.setOnMenuItemClickListener {
+                when (it.itemId){
+                    R.id.menu_subscript_add -> {
+                        val plane = EditText(context).apply {
+                            hint = "机场名"
+                        }
+                        val url = EditText(context).apply {
+                            hint = "订阅链接"
+                        }
+                        AlertDialog.Builder(context).apply {
+                            setTitle("Edit")
+                            setView(LinearLayout(context).apply {
+                                orientation = LinearLayout.VERTICAL
+                                addView(plane)
+                                addView(url)
+                            })
+                            setNegativeButton("Cancel", null)
+                            setPositiveButton("Ok"){ _, _ ->
+                                data.addSubscripts(plane.text.toString(), url.text.toString())
+                            }
+                        }.show()
+                        true
+                    }
+                    R.id.menu_config_save ->{
+                        runCatching {
+                            File(GExternalCacheDir, "out_config.yaml").outputStream().use { op ->
+                                op.write(Yaml.encodeToString(data).toByteArray())
+                            }
+                            SuiHelper.suCmd("mv -f ${ClashConfig.configPath} ${ClashConfig.configPath}.o")
+                            SuiHelper.suCmd("cp -f $GExternalCacheDir/out_config.yaml ${ClashConfig.configPath}")
+                        }.onSuccess {
+                            Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+                        }.onFailure {
+                            Toast.makeText(context, "Failure", Toast.LENGTH_SHORT).show()
+                        }
+                        true
+                    }
+                    else ->
+                        false
+                }
             }
-            ItemTouchHelper(
-                ConfigAdapterCallback(
-                    adapter as ConfigAdapterCallback.TouchListener
-                )
-            ).attachToRecyclerView(this)
+            withContext(Dispatchers.Main){
+                list_view.apply {
+                    layoutManager = LinearLayoutManager(context)
+
+                    adapter = ConfigRecyclerAdapter(data){
+                        val plane = EditText(context).apply {
+                            hint = "机场名"
+                            setText(it[0])
+                        }
+                        val url = EditText(context).apply {
+                            hint = "订阅链接"
+                            setText(it[1])
+                        }
+                        AlertDialog.Builder(context).apply {
+                            setTitle("Edit")
+                            setView(LinearLayout(context).apply {
+                                orientation = LinearLayout.VERTICAL
+                                addView(plane)
+                                addView(url)
+                            })
+                            setNegativeButton("Cancel", null)
+                            setPositiveButton("Ok"){ _, _ ->
+                                it[0] = plane.text.toString()
+                                it[1] = url.text.toString()
+                            }
+                        }.show()
+                    }
+                    ItemTouchHelper(
+                        ConfigAdapterCallback(
+                            adapter as ConfigAdapterCallback.TouchListener
+                        )
+                    ).attachToRecyclerView(this)
+                }
+            }
         }
     }
 

@@ -14,7 +14,7 @@ class ConfigAdapterCallback(private val cb: TouchListener): ItemTouchHelper.Call
     override fun getMovementFlags(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder
-    ): Int = makeMovementFlags(ItemTouchHelper.DOWN or ItemTouchHelper.UP, ItemTouchHelper.LEFT)
+    ): Int = makeMovementFlags(/*ItemTouchHelper.DOWN or ItemTouchHelper.UP*/0, ItemTouchHelper.LEFT)
 
     override fun onMove(
         recyclerView: RecyclerView,

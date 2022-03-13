@@ -45,8 +45,6 @@
         android:id="@+id/configPage"
         android:name="com.dashboard.kotlin.ConfigPage"
         android:label="fragment_config_page"
-        tools:layout="@layout/fragment_config_page_list">
-
-    </fragment>
+        tools:layout="@layout/fragment_config_page_list" />
 
 </navigation>

@@ -8,6 +8,7 @@
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.21041666666666667" />
         <entry key="app/src/main/res/drawable/ic_about.xml" value="0.26458333333333334" />
         <entry key="app/src/main/res/drawable/ic_activited.xml" value="0.24427083333333333" />
+        <entry key="app/src/main/res/drawable/ic_add.xml" value="0.2635" />
         <entry key="app/src/main/res/drawable/ic_apps.xml" value="0.26458333333333334" />
         <entry key="app/src/main/res/drawable/ic_back.xml" value="0.2109375" />
         <entry key="app/src/main/res/drawable/ic_clean.xml" value="0.26458333333333334" />
@@ -20,7 +21,9 @@
         <entry key="app/src/main/res/drawable/ic_logs.xml" value="0.21041666666666667" />
         <entry key="app/src/main/res/drawable/ic_refresh.xml" value="0.212" />
         <entry key="app/src/main/res/drawable/ic_restart.xml" value="0.212" />
+        <entry key="app/src/main/res/drawable/ic_save.xml" value="0.2635" />
         <entry key="app/src/main/res/drawable/ic_service_not_running.xml" value="0.36666666666666664" />
+        <entry key="app/src/main/res/drawable/ic_setting.xml" value="0.2635" />
         <entry key="app/src/main/res/drawable/ic_settings.xml" value="0.20729166666666668" />
         <entry key="app/src/main/res/drawable/ic_speed.xml" value="0.21041666666666667" />
         <entry key="app/src/main/res/drawable/ic_stop.xml" value="0.21041666666666667" />
@@ -36,6 +39,7 @@
         <entry key="app/src/main/res/layout/fragment_config_page_item.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_config_page_list.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_download_page.xml" value="0.19427083333333334" />
+        <entry key="app/src/main/res/layout/fragment_edit_page.xml" value="0.20222317229585293" />
         <entry key="app/src/main/res/layout/fragment_ip_check_page.xml" value="0.35052083333333334" />
         <entry key="app/src/main/res/layout/fragment_ip_check_page_ip.xml" value="0.3494791666666667" />
         <entry key="app/src/main/res/layout/fragment_ip_cleck_page_web.xml" value="0.35052083333333334" />
@@ -47,7 +51,9 @@
         <entry key="app/src/main/res/layout/fragment_setting_page.xml" value="0.19114583333333332" />
         <entry key="app/src/main/res/layout/fragment_webview_page.xml" value="0.35052083333333334" />
         <entry key="app/src/main/res/layout/toolbar.xml" value="0.19114583333333332" />
+        <entry key="app/src/main/res/menu/config_menu.xml" value="0.9300970873786408" />
         <entry key="app/src/main/res/menu/menu_restart.xml" value="0.2484375" />
+        <entry key="app/src/main/res/xml/root_preferences.xml" value="0.25" />
       </map>
     </option>
   </component>
