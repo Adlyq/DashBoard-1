@@ -36,9 +36,9 @@ class ConfigPage : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         lifecycleScope.launch(Dispatchers.IO){
-            val oData = Regex("(?> )(https?://[^ '\"\n]*)(?=[\n ])").replace(SuiHelper.suCmd(
+            val oData = Regex("(?<= )https?://[^ '\"\n]*(?=[\n ])").replace(SuiHelper.suCmd(
                 "sed -n -E '/^proxies:.*\$/,\$p' ${ClashConfig.configPath}"
-            ), " '\$1'")
+            ), " '\$0'")
             Log.d("TEST", oData)
             val data = Yaml.decodeFromString(
                 ConfigYaml.serializer(),
