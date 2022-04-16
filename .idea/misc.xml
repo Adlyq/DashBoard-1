@@ -5,6 +5,7 @@
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.2635416666666667" />
         <entry key="../../../layout/custom_preview.xml" value="0.20625" />
+        <entry key="..\:/Users/xuyong/DashBoard-1/app/src/main/res/drawable/ic_icon.xml" value="0.206" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.21041666666666667" />
         <entry key="app/src/main/res/drawable/ic_about.xml" value="0.26458333333333334" />
         <entry key="app/src/main/res/drawable/ic_activited.xml" value="0.24427083333333333" />
@@ -55,7 +56,7 @@
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">
