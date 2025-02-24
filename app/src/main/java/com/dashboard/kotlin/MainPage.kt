@@ -80,7 +80,7 @@ class MainPage : Fragment(), androidx.appcompat.widget.Toolbar.OnMenuItemClickLi
                         restartApp()
                         break
                     }
-                    delay(1 * 1000)
+                    delay(2 * 1000)
                 }
             }
 
