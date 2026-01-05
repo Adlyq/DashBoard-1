@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+      xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/menu_update_config"
-        android:icon="@drawable/ic_update1"
-        android:title="@string/menu_update_config"
-        app:showAsAction="ifRoom"/>
+            android:id="@+id/menu_update_kernel"
+            android:icon="@drawable/ic_update1"
+            android:title="@string/menu_update_kernel"
+            app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/menu_update_geox"
-        android:icon="@drawable/ic_restart"
-        android:title="@string/menu_update_geox"
-        app:showAsAction="ifRoom"/>
+            android:id="@+id/menu_update_config"
+            android:icon="@drawable/ic_restart"
+            android:title="@string/menu_update_config"
+            app:showAsAction="ifRoom"/>
 </menu>

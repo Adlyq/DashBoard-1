@@ -122,7 +122,7 @@ object ClashStatus {
         if (isCmdRunning) return
         isCmdRunning = true
         Shell.cmd(
-            "${ClashConfig.scriptsPath}/clash.service -s && ${ClashConfig.scriptsPath}/clash.iptables -s"
+            "sh ${ClashConfig.scriptsPath}/clash.service -s && sh ${ClashConfig.scriptsPath}/clash.iptables -s"
         ).submit{
             isCmdRunning = false
         }
@@ -132,7 +132,7 @@ object ClashStatus {
         if (isCmdRunning) return
         isCmdRunning = true
         Shell.cmd(
-            "${ClashConfig.scriptsPath}/clash.service -k",
+            "sh ${ClashConfig.scriptsPath}/clash.service -k",
             "${ClashConfig.scriptsPath}/clash.iptables -k"
         ).submit{
             isCmdRunning = false
@@ -149,10 +149,11 @@ object ClashStatus {
         }
 
 
-    fun updateGeox(){
+    fun updateKernel(){
         if (isCmdRunning) return
         isCmdRunning = true
-        Shell.cmd("${ClashConfig.scriptsPath}/clash.tool -u").submit{
+        Shell.cmd("sh ${ClashConfig.scriptsPath}/update.sh").submit{
+            Log.w("TAG", "updateKernel: ${it.out.joinToString("\n")}", )
             isCmdRunning = false
         }
     }

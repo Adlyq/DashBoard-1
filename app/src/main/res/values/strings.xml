@@ -8,7 +8,7 @@
     <string name="clash_charging">命令执行中</string>
     <string name="sui_disable">未授予root权限\n请使用Sui或Magisk授权</string>
     <string name="netspeed_status_text">上传 %s  下载 %s\nRES %s  CPU %s</string>
-    <string name="menu_update_geox">更新GeoX</string>
+    <string name="menu_update_kernel">更新内核</string>
     <string name="menu_update_config">热更新配置</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"

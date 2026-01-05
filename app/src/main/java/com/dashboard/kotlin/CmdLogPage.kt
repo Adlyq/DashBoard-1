@@ -17,7 +17,7 @@ class CmdLogPage : BaseLogPage() {
     private val job = Shell.Builder.create()
         .setInitializers(Shell.Initializer::class.java)
         .build()
-        .newJob().add("tail -f ${ClashConfig.logPath}")
+        .newJob().add("cat ${ClashConfig.logPath}")
     var flag = false
 
     override fun onResume() {
@@ -41,7 +41,7 @@ class CmdLogPage : BaseLogPage() {
             false
         }
         readLogScope = lifecycleScope.launch(Dispatchers.IO) {
-            val clashV = Shell.cmd("${ClashConfig.corePath} -v").exec().out.joinToString("\n")
+            val clashV = Shell.cmd("${ClashConfig.corePath} -v").exec().out.first()
             withContext(Dispatchers.Main){
                 binding.logCat.text = formatLog("$clashV\n${readLog()}")
             }
@@ -61,14 +61,13 @@ class CmdLogPage : BaseLogPage() {
                 }
             }
         }
-
-        lifecycleScope.launch(Dispatchers.IO){
-            job.to(lst).exec()
-        }
     }
-    val lst = mutableListOf<String>()
 
     private suspend fun readLog(): String{
+        val lst = mutableListOf<String>()
+        withContext(Dispatchers.IO) {
+            job.to(lst).exec()
+        }
         return lst.joinToString("\n")
     }
 
