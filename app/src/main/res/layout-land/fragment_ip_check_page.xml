@@ -1,36 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    tools:context=".IpCheckPage">
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/swipeView">
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="18dp"
-            android:orientation="horizontal">
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" tools:context=".IpCheckPage">
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/swipeView">
+        <androidx.appcompat.widget.LinearLayoutCompat android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="18dp" android:orientation="horizontal">
 
-            <ScrollView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent">
+            <ScrollView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent">
 
-                <include layout="@layout/fragment_ip_check_page_ip" />
+                <include android:id="@+id/layout_ip" layout="@layout/fragment_ip_check_page_ip" />
 
             </ScrollView>
 
-            <ScrollView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent">
+            <ScrollView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent">
 
-                <include layout="@layout/fragment_ip_cleck_page_web" />
+                <include android:id="@+id/layout_web" layout="@layout/fragment_ip_cleck_page_web" />
 
             </ScrollView>
         </androidx.appcompat.widget.LinearLayoutCompat>

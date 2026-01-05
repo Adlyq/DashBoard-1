@@ -5,7 +5,6 @@ import androidx.core.text.HtmlCompat
 import androidx.lifecycle.lifecycleScope
 import com.dashboard.kotlin.clashhelper.ClashConfig
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.fragment_log.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import okhttp3.*
@@ -59,7 +58,7 @@ class KernelLogPage: BaseLogPage() {
     }
 
     private fun showLog() {
-        log_cat?.text = HtmlCompat.fromHtml(logs.joinToString(""),HtmlCompat.FROM_HTML_MODE_LEGACY)
+        binding.logCat.text = HtmlCompat.fromHtml(logs.joinToString(""),HtmlCompat.FROM_HTML_MODE_LEGACY)
     }
 
     companion object {

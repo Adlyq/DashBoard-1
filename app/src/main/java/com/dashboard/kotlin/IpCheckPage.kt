@@ -9,15 +9,16 @@ import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import kotlinx.android.synthetic.main.fragment_ip_check_page.*
-import kotlinx.android.synthetic.main.fragment_ip_check_page_ip.*
-import kotlinx.android.synthetic.main.fragment_ip_cleck_page_web.*
+import com.dashboard.kotlin.databinding.FragmentIpCheckPageBinding
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import java.net.URL
 
 @DelicateCoroutinesApi
 class IpCheckPage : Fragment(), SwipeRefreshLayout.OnRefreshListener {
+
+    private var _binding: FragmentIpCheckPageBinding? = null
+    private val binding get() = _binding!!
 
     private lateinit var coroutineScope: Job
     private lateinit var sukkAPiThreadContext: ExecutorCoroutineDispatcher
@@ -32,22 +33,23 @@ class IpCheckPage : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_ip_check_page, container, false)
+        _binding = FragmentIpCheckPageBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         startCheck()
         super.onViewCreated(view, savedInstanceState)
-        swipeView.setOnRefreshListener(this)
+        binding.swipeView.setOnRefreshListener(this)
         Log.d("ViewCreated", "ipCheckPageViewCreated")
     }
 
     @OptIn(ObsoleteCoroutinesApi::class)
     private fun startCheck() {
-        swipeView.isRefreshing = true
+        binding.swipeView.isRefreshing = true
         sukkAPiThreadContext = newSingleThreadContext("sukkAPiThread")
         ipipNetThreadContext = newSingleThreadContext("ipipNetThread")
         ipSbApiThreadContext = newSingleThreadContext("ipSbApiThread")
@@ -72,7 +74,7 @@ class IpCheckPage : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
                 withContext(Dispatchers.Main) {
                     runCatching {
-                        sukka_api_result.text = tempStr
+                        binding.layoutIp.sukkaApiResult.text = tempStr
                     }
                 }
             }
@@ -89,7 +91,7 @@ class IpCheckPage : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 }.getOrDefault("error")
                 withContext(Dispatchers.Main) {
                     runCatching {
-                        ipip_net_result.text = tempStr
+                        binding.layoutIp.ipipNetResult.text = tempStr
                     }
                 }
             }
@@ -104,7 +106,7 @@ class IpCheckPage : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 }.getOrDefault("error")
                 withContext(Dispatchers.Main) {
                     runCatching {
-                        ip_sb_result.text = tempStr
+                        binding.layoutIp.ipSbResult.text = tempStr
                     }
                 }
             }
@@ -139,7 +141,7 @@ class IpCheckPage : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                 }.getOrDefault("error")
                 withContext(Dispatchers.Main) {
                     runCatching {
-                        sukka_api_global_result.text = tempStr
+                        binding.layoutIp.sukkaApiGlobalResult.text = tempStr
                     }
                 }
             }
@@ -161,8 +163,8 @@ class IpCheckPage : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                         val color = if (tempStr == "无法访问") ResourcesCompat.getColor(
                             resources, R.color.orange, context?.theme
                         ) else ResourcesCompat.getColor(resources, R.color.green, context?.theme)
-                        baiduCheck.text = tempStr
-                        baiduCheck.setTextColor(color)
+                        binding.layoutWeb.baiduCheck.text = tempStr
+                        binding.layoutWeb.baiduCheck.setTextColor(color)
                     }
                 }
             }
@@ -183,8 +185,8 @@ class IpCheckPage : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                         val color = if (tempStr == "无法访问") ResourcesCompat.getColor(
                             resources, R.color.orange, context?.theme
                         ) else ResourcesCompat.getColor(resources, R.color.green, context?.theme)
-                        neteaseMusicCheck.text = tempStr
-                        neteaseMusicCheck.setTextColor(color)
+                        binding.layoutWeb.neteaseMusicCheck.text = tempStr
+                        binding.layoutWeb.neteaseMusicCheck.setTextColor(color)
                     }
                 }
 
@@ -205,8 +207,8 @@ class IpCheckPage : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                         val color = if (tempStr == "无法访问") ResourcesCompat.getColor(
                             resources, R.color.orange, context?.theme
                         ) else ResourcesCompat.getColor(resources, R.color.green, context?.theme)
-                        githubCheck.text = tempStr
-                        githubCheck.setTextColor(color)
+                        binding.layoutWeb.githubCheck.text = tempStr
+                        binding.layoutWeb.githubCheck.setTextColor(color)
                     }
                 }
 
@@ -227,8 +229,8 @@ class IpCheckPage : Fragment(), SwipeRefreshLayout.OnRefreshListener {
                         val color = if (tempStr == "无法访问") ResourcesCompat.getColor(
                             resources, R.color.orange, context?.theme
                         ) else ResourcesCompat.getColor(resources, R.color.green, context?.theme)
-                        youtubeCheck.text = tempStr
-                        youtubeCheck.setTextColor(color)
+                        binding.layoutWeb.youtubeCheck.text = tempStr
+                        binding.layoutWeb.youtubeCheck.setTextColor(color)
                     }
                 }
 
@@ -236,7 +238,7 @@ class IpCheckPage : Fragment(), SwipeRefreshLayout.OnRefreshListener {
         }
         lifecycleScope.launch {
             coroutineScope.join()
-            swipeView.isRefreshing = false
+            binding.swipeView.isRefreshing = false
         }
     }
 
@@ -254,10 +256,7 @@ class IpCheckPage : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
             coroutineScope.cancel()
 
-            sukka_api_result.text = ""
-            ipip_net_result.text = ""
-            ip_sb_result.text = ""
-            sukka_api_global_result.text = ""
+            _binding = null
         } finally {
             Log.d("ViewDestroy", "ipCheckPageDestroyView")
         }
@@ -266,14 +265,14 @@ class IpCheckPage : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
-        sukka_api_result.text = ""
-        ipip_net_result.text = ""
-        ip_sb_result.text = ""
-        sukka_api_global_result.text = ""
-        baiduCheck.text = ""
-        neteaseMusicCheck.text = ""
-        githubCheck.text = ""
-        youtubeCheck.text = ""
+        binding.layoutIp.sukkaApiResult.text = ""
+        binding.layoutIp.ipipNetResult.text = ""
+        binding.layoutIp.ipSbResult.text = ""
+        binding.layoutIp.sukkaApiGlobalResult.text = ""
+        binding.layoutWeb.baiduCheck.text = ""
+        binding.layoutWeb.neteaseMusicCheck.text = ""
+        binding.layoutWeb.githubCheck.text = ""
+        binding.layoutWeb.youtubeCheck.text = ""
         startCheck()
     }
 

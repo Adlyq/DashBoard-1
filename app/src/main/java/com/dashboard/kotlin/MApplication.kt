@@ -15,8 +15,8 @@ class MApplication : Application() {
     init {
         Shell.setDefaultBuilder(
             Shell.Builder.create()
-                .setInitializers(BusyBoxInstaller::class.java)
                 .setFlags(Shell.FLAG_REDIRECT_STDERR)
+                .setInitializers(Shell.Initializer::class.java)
         )
     }
 

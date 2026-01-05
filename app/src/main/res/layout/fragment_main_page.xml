@@ -1,35 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".MainPage">
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" tools:context=".MainPage">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:orientation="vertical">
+    <androidx.appcompat.widget.LinearLayoutCompat android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="10dp" android:orientation="vertical">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/mToolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:title="@string/app_name"
-            app:menu="@menu/main_menu"/>
+        <androidx.appcompat.widget.Toolbar android:id="@+id/mToolbar" android:layout_width="match_parent" android:layout_height="?attr/actionBarSize" android:theme="@style/ThemeOverlay.AppCompat.ActionBar" app:popupTheme="@style/ThemeOverlay.AppCompat.Light" app:title="@string/app_name" app:menu="@menu/main_menu"/>
 
-        <include layout="@layout/fragment_main_page_buttons"/>
+        <include android:id="@+id/layout_buttons" layout="@layout/fragment_main_page_buttons"/>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
 
-    <include layout="@layout/fragment_main_pages"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        style="@style/DefaultCard" />
+    <include android:id="@+id/layout_pages" layout="@layout/fragment_main_pages" android:layout_height="match_parent" android:layout_width="match_parent" style="@style/DefaultCard" />
 
 </LinearLayout>

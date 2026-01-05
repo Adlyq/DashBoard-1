@@ -9,20 +9,29 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.dashboard.kotlin.MApplication.Companion.KV
-import kotlinx.android.synthetic.main.fragment_main_pages.*
+import com.dashboard.kotlin.databinding.FragmentSpeedTestPageBinding
 
 class SpeedTestPage : Fragment() {
+
+    private var _binding: FragmentSpeedTestPageBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_speed_test_page, container, false)
+        _binding = FragmentSpeedTestPageBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewPager.adapter = object: FragmentStateAdapter(this){
+        binding.viewPager.adapter = object: FragmentStateAdapter(this){
 
             val urls = arrayListOf(
                 "https://fast.com/zh/cn/",
@@ -40,8 +49,8 @@ class SpeedTestPage : Fragment() {
             }
         }
 
-        viewPager.setCurrentItem(KV.getInt("SpeedTestIndex", 0), false)
-        viewPager.registerOnPageChangeCallback(
+        binding.viewPager.setCurrentItem(KV.getInt("SpeedTestIndex", 0), false)
+        binding.viewPager.registerOnPageChangeCallback(
             object : ViewPager2.OnPageChangeCallback(){
                 override fun onPageSelected(position: Int) {
                     KV.putInt("SpeedTestIndex", position)
@@ -51,7 +60,7 @@ class SpeedTestPage : Fragment() {
         runCatching {
             val recyclerViewField = ViewPager2::class.java.getDeclaredField("mRecyclerView")
             recyclerViewField.isAccessible = true
-            val recyclerView = recyclerViewField.get(viewPager) as RecyclerView
+            val recyclerView = recyclerViewField.get(binding.viewPager) as RecyclerView
             val touchSlopField = RecyclerView::class.java.getDeclaredField("mTouchSlop")
             touchSlopField.isAccessible = true
             val touchSlop = touchSlopField.get(recyclerView) as Int

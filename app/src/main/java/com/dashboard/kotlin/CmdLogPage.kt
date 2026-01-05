@@ -10,15 +10,14 @@ import com.dashboard.kotlin.clashhelper.ClashConfig
 import com.dashboard.kotlin.clashhelper.ClashStatus
 import com.topjohnwu.superuser.BusyBoxInstaller
 import com.topjohnwu.superuser.Shell
-import kotlinx.android.synthetic.main.fragment_log.*
 import kotlinx.coroutines.*
 
 @DelicateCoroutinesApi
 class CmdLogPage : BaseLogPage() {
     private val job = Shell.Builder.create()
-        .setInitializers(BusyBoxInstaller::class.java)
+        .setInitializers(Shell.Initializer::class.java)
         .build()
-        .newJob().add("cat ${ClashConfig.logPath}")
+        .newJob().add("tail -f ${ClashConfig.logPath}")
     var flag = false
 
     override fun onResume() {
@@ -33,10 +32,10 @@ class CmdLogPage : BaseLogPage() {
 
     var readLogScope: Job? = null
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
     fun start(){
         if (readLogScope?.isActive == true) return
-        log_cat.setOnTouchListener { v, _ ->
+        binding.logCat.setOnTouchListener { v, _ ->
             flag = true
             v.performClick()
             false
@@ -44,7 +43,7 @@ class CmdLogPage : BaseLogPage() {
         readLogScope = lifecycleScope.launch(Dispatchers.IO) {
             val clashV = Shell.cmd("${ClashConfig.corePath} -v").exec().out.joinToString("\n")
             withContext(Dispatchers.Main){
-                log_cat.text = formatLog("$clashV\n${readLog()}")
+                binding.logCat.text = formatLog("$clashV\n${readLog()}")
             }
             while (true){
                 if (ClashStatus.isCmdRunning){
@@ -56,19 +55,20 @@ class CmdLogPage : BaseLogPage() {
                 if (flag) continue
                 withContext(Dispatchers.Main){
                     runCatching {
-                        log_cat.text = formatLog("$clashV\n${readLog()}")
-                        scrollView.fullScroll(ScrollView.FOCUS_DOWN)
+                        binding.logCat.text = formatLog("$clashV\n${readLog()}")
+                        binding.scrollView.fullScroll(ScrollView.FOCUS_DOWN)
                     }
                 }
             }
         }
-    }
 
-    private suspend fun readLog(): String{
-        val lst = mutableListOf<String>()
-        withContext(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO){
             job.to(lst).exec()
         }
+    }
+    val lst = mutableListOf<String>()
+
+    private suspend fun readLog(): String{
         return lst.joinToString("\n")
     }
 

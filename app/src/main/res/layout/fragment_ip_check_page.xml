@@ -1,27 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    style="@style/Default"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:scrollbars="none"
-    tools:context=".IpCheckPage">
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/swipeView">
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+    xmlns:tools="http://schemas.android.com/tools" style="@style/Default" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:scrollbars="none" tools:context=".IpCheckPage">
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/swipeView">
+        <ScrollView android:layout_width="match_parent" android:layout_height="wrap_content">
 
-            <androidx.appcompat.widget.LinearLayoutCompat
-                style="@style/Default"
-                android:orientation="vertical">
+            <androidx.appcompat.widget.LinearLayoutCompat style="@style/Default" android:orientation="vertical">
 
-                <include layout="@layout/fragment_ip_check_page_ip"/>
+                <include android:id="@+id/layout_ip" layout="@layout/fragment_ip_check_page_ip"/>
 
-                <include layout="@layout/fragment_ip_cleck_page_web"/>
+                <include android:id="@+id/layout_web" layout="@layout/fragment_ip_cleck_page_web"/>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
         </ScrollView>

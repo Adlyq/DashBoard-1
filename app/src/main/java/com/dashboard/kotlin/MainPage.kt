@@ -22,10 +22,8 @@ import com.dashboard.kotlin.clashhelper.ClashConfig
 import com.dashboard.kotlin.clashhelper.ClashStatus
 import com.dashboard.kotlin.clashhelper.CommandHelper
 import com.dashboard.kotlin.clashhelper.WebUI
+import com.dashboard.kotlin.databinding.FragmentMainPageBinding
 import com.topjohnwu.superuser.Shell
-import kotlinx.android.synthetic.main.fragment_main_page.*
-import kotlinx.android.synthetic.main.fragment_main_page_buttons.*
-import kotlinx.android.synthetic.main.fragment_main_pages.*
 import kotlinx.coroutines.*
 import org.json.JSONObject
 
@@ -34,19 +32,27 @@ import org.json.JSONObject
 class MainPage : Fragment(), androidx.appcompat.widget.Toolbar.OnMenuItemClickListener,
     View.OnLongClickListener {
 
+    private var _binding: FragmentMainPageBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
-        if (KV.getBoolean("TailLongClick", false))
+        if (KV.getBoolean("TailLongClick", false)) {
             runCatching {
                 findNavController()
                     .navigate(R.id.action_mainPage_to_webViewPage_withoutBackStack, getWebViewBundle())
             }
+        }
+        _binding = FragmentMainPageBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        Log.d("onCreateView", "MainPage onCreateView !")
-        return inflater.inflate(R.layout.fragment_main_page, container, false)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     @SuppressLint("SetTextI18n")
@@ -54,25 +60,27 @@ class MainPage : Fragment(), androidx.appcompat.widget.Toolbar.OnMenuItemClickLi
         super.onViewCreated(view, savedInstanceState)
         Log.d("ViewCreated", "MainPageViewCreated")
 
-        mToolbar.setOnMenuItemClickListener(this)
+        binding.mToolbar.setOnMenuItemClickListener(this)
         //TODO 添加 app 图标
-        mToolbar.title = getString(R.string.app_name) +
+        binding.mToolbar.title = getString(R.string.app_name) +
                 "-V" +
-                BuildConfig.VERSION_NAME.replace(Regex(".r.+$"),"")
+                BuildConfig.VERSION_NAME.replace(Regex(".r.+$"), "")
 
         if (!Shell.cmd("su -c 'exit'").exec().isSuccess) {
-            clash_status.setCardBackgroundColor(
-                ResourcesCompat.getColor(resources, R.color.error, context?.theme)
-            )
-            clash_status_icon.setImageDrawable(
-                ResourcesCompat.getDrawable(
-                    resources,
-                    R.drawable.ic_service_not_running,
-                    context?.theme
+            binding.layoutButtons.run {
+                clashStatus.setCardBackgroundColor(
+                    ResourcesCompat.getColor(resources, R.color.error, context?.theme)
                 )
-            )
-            clash_status_text.text = getString(R.string.sui_disable)
-            resources_status_text.visibility = View.GONE
+                clashStatusIcon.setImageDrawable(
+                    ResourcesCompat.getDrawable(
+                        resources,
+                        R.drawable.ic_service_not_running,
+                        context?.theme
+                    )
+                )
+                clashStatusText.text = getString(R.string.sui_disable)
+                resourcesStatusText.visibility = View.GONE
+            }
 
             lifecycleScope.launch {
                 while (true) {
@@ -86,48 +94,54 @@ class MainPage : Fragment(), androidx.appcompat.widget.Toolbar.OnMenuItemClickLi
 
         }
 
-        clash_status.setOnClickListener {
-            ClashStatus.switch()
-        }
-
-        menu_ip_check.setOnClickListener {
-            runCatching {
-                it.findNavController().navigate(R.id.action_mainPage_to_ipCheckPage)
+        binding.layoutButtons.run {
+            clashStatus.setOnClickListener {
+                ClashStatus.switch()
             }
-        }
 
-        menu_web_dashboard.setOnLongClickListener(this)
-        menu_web_dashboard.setOnClickListener {
-            runCatching {
-                it.findNavController().navigate(R.id.action_mainPage_to_webViewPage, getWebViewBundle())
-            }
-        }
-
-        menu_speed_test.setOnClickListener {
-            runCatching {
-                it.findNavController().navigate(R.id.action_mainPage_to_speedTestPage)
-            }
-        }
-
-        viewPager.adapter = object: FragmentStateAdapter(this){
-            val pages = listOf(
-                Fragment::class.java,
-                CmdLogPage::class.java,
-                KernelLogPage::class.java
-            )
-
-            override fun getItemCount() = pages.size
-
-            override fun createFragment(position: Int) = pages[position].newInstance()
-        }
-
-        viewPager.setCurrentItem(KV.getInt("ViewPagerIndex", 0), false)
-        viewPager.registerOnPageChangeCallback(
-            object : ViewPager2.OnPageChangeCallback(){
-                override fun onPageSelected(position: Int) {
-                    KV.putInt("ViewPagerIndex", position)
+            menuIpCheck.setOnClickListener {
+                runCatching {
+                    it.findNavController().navigate(R.id.action_mainPage_to_ipCheckPage)
                 }
-            })
+            }
+
+            menuWebDashboard.setOnLongClickListener(this@MainPage)
+            menuWebDashboard.setOnClickListener {
+                runCatching {
+                    it.findNavController()
+                        .navigate(R.id.action_mainPage_to_webViewPage, getWebViewBundle())
+                }
+            }
+
+            menuSpeedTest.setOnClickListener {
+                runCatching {
+                    it.findNavController().navigate(R.id.action_mainPage_to_speedTestPage)
+                }
+            }
+        }
+
+        binding.layoutPages.viewPager.run {
+            adapter = object : FragmentStateAdapter(this@MainPage) {
+                val pages = listOf(
+                    Fragment::class.java,
+                    CmdLogPage::class.java,
+                    KernelLogPage::class.java
+                )
+
+                override fun getItemCount() = pages.size
+
+                override fun createFragment(position: Int) =
+                    pages[position].declaredConstructors.first().newInstance() as Fragment
+            }
+
+            setCurrentItem(KV.getInt("ViewPagerIndex", 0), false)
+            registerOnPageChangeCallback(
+                object : ViewPager2.OnPageChangeCallback() {
+                    override fun onPageSelected(position: Int) {
+                        KV.putInt("ViewPagerIndex", position)
+                    }
+                })
+        }
 
         lifecycleScope.launch(Dispatchers.Main) {
             delay(200)
@@ -135,12 +149,12 @@ class MainPage : Fragment(), androidx.appcompat.widget.Toolbar.OnMenuItemClickLi
         }
     }
 
-    private fun stopStatusScope(){
+    private fun stopStatusScope() {
         ClashStatus.stopGetStatus()
     }
 
     private fun startStatusScope() {
-        ClashStatus.startGetStatus{ statusText ->
+        ClashStatus.startGetStatus { statusText ->
             runCatching {
                 val jsonObject = JSONObject(statusText)
                 val upText: String = CommandHelper.autoUnitForSpeed(jsonObject.optString("up"))
@@ -148,13 +162,13 @@ class MainPage : Fragment(), androidx.appcompat.widget.Toolbar.OnMenuItemClickLi
                     CommandHelper.autoUnitForSpeed(jsonObject.optString("down"))
                 val res = CommandHelper.autoUnitForSize(jsonObject.optString("RES"))
                 val cpu = jsonObject.optString("CPU")
-                    resources_status_text.text =
-                        getString(R.string.netspeed_status_text).format(
-                            upText,
-                            downText,
-                            res,
-                            cpu
-                        )
+                binding.layoutButtons.resourcesStatusText.text =
+                    getString(R.string.netspeed_status_text).format(
+                        upText,
+                        downText,
+                        res,
+                        cpu
+                    )
             }
         }
     }
@@ -177,47 +191,51 @@ class MainPage : Fragment(), androidx.appcompat.widget.Toolbar.OnMenuItemClickLi
         runningStatusScope = lifecycleScope.launch {
             var lastStatus: ClashStatus.Status? = null
             var lastViewPage: Int? = null
-            while (true){
+            while (true) {
                 val status = ClashStatus.getRunStatus()
                 if (lastStatus == status) continue else lastStatus = status
 
-                clash_status.isClickable = status != ClashStatus.Status.CmdRunning
-                if (status != ClashStatus.Status.Running) {
-                    resources_status_text.visibility = View.VISIBLE
-                    startStatusScope()
-                } else {
-                    resources_status_text.visibility = View.INVISIBLE
-                    stopStatusScope()
-                }
-                clash_status.setCardBackgroundColor(
-                    ResourcesCompat.getColor(resources,
-                        if (status == ClashStatus.Status.Running)
-                            R.color.colorPrimary
-                        else
-                            R.color.gray
-                        , context?.theme)
-                )
-                clash_status_icon.setImageDrawable(
-                    ResourcesCompat.getDrawable(resources,
-                        when(status){
-                            ClashStatus.Status.CmdRunning -> R.drawable.ic_refresh
-                            ClashStatus.Status.Running -> R.drawable.ic_activited
-                            ClashStatus.Status.Stop -> R.drawable.ic_service_not_running
-                        }
-                        , context?.theme)
-                )
-                clash_status_text.text = when(status){
-                    ClashStatus.Status.CmdRunning -> getString(R.string.clash_charging)
-                    ClashStatus.Status.Running -> getString(R.string.clash_enable)
-                    ClashStatus.Status.Stop -> getString(R.string.clash_disable)
+                binding.layoutButtons.run {
+                    clashStatus.isClickable = status != ClashStatus.Status.CmdRunning
+                    if (status != ClashStatus.Status.Running) {
+                        resourcesStatusText.visibility = View.VISIBLE
+                        startStatusScope()
+                    } else {
+                        resourcesStatusText.visibility = View.INVISIBLE
+                        stopStatusScope()
+                    }
+                    clashStatus.setCardBackgroundColor(
+                        ResourcesCompat.getColor(
+                            resources,
+                            if (status == ClashStatus.Status.Running)
+                                R.color.colorPrimary
+                            else
+                                R.color.gray, context?.theme
+                        )
+                    )
+                    clashStatusIcon.setImageDrawable(
+                        ResourcesCompat.getDrawable(
+                            resources,
+                            when (status) {
+                                ClashStatus.Status.CmdRunning -> R.drawable.ic_refresh
+                                ClashStatus.Status.Running -> R.drawable.ic_activited
+                                ClashStatus.Status.Stop -> R.drawable.ic_service_not_running
+                            }, context?.theme
+                        )
+                    )
+                    clashStatusText.text = when (status) {
+                        ClashStatus.Status.CmdRunning -> getString(R.string.clash_charging)
+                        ClashStatus.Status.Running -> getString(R.string.clash_enable)
+                        ClashStatus.Status.Stop -> getString(R.string.clash_disable)
+                    }
                 }
                 if (status == ClashStatus.Status.CmdRunning) {
-                    lastViewPage = viewPager.currentItem
-                    viewPager.setCurrentItem(1, true)
+                    lastViewPage = binding.layoutPages.viewPager.currentItem
+                    binding.layoutPages.viewPager.setCurrentItem(1, true)
                 } else launch {
                     lastViewPage?.let {
                         delay(3000)
-                        viewPager.setCurrentItem(it, true)
+                        binding.layoutPages.viewPager.setCurrentItem(it, true)
                     }
                 }
                 delay(500)
@@ -230,26 +248,29 @@ class MainPage : Fragment(), androidx.appcompat.widget.Toolbar.OnMenuItemClickLi
             ?.getLaunchIntentForPackage(activity?.baseContext!!.packageName)
         intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         intent?.putExtra("REBOOT", "reboot")
-        startActivity(intent)
+        startActivity(intent!!)
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean =
-        when(item.itemId){
+        when (item.itemId) {
             R.id.menu_update_geox -> {
-                when{
+                when {
                     !Shell.cmd("su -c 'exit'").exec().isSuccess ->
                         Toast.makeText(context, "莫得权限呢", Toast.LENGTH_SHORT).show()
+
                     ClashStatus.isCmdRunning ->
                         Toast.makeText(context, "现在不可以哦", Toast.LENGTH_SHORT).show()
+
                     else -> ClashStatus.updateGeox()
                 }
                 true
             }
+
             R.id.menu_update_config -> {
                 lifecycleScope.launch {
                     val status = ClashStatus.getRunStatus()
                     if (status == ClashStatus.Status.Running)
-                        ClashConfig.updateConfig{
+                        ClashConfig.updateConfig {
                             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
                         }
                     else
@@ -257,6 +278,7 @@ class MainPage : Fragment(), androidx.appcompat.widget.Toolbar.OnMenuItemClickLi
                 }
                 true
             }
+
             else -> false
         }
 
@@ -275,20 +297,23 @@ class MainPage : Fragment(), androidx.appcompat.widget.Toolbar.OnMenuItemClickLi
                 ll.orientation = LinearLayout.VERTICAL
                 ll.addView(
                     Spinner(context).also {
-                        it.adapter = ArrayAdapter(context, android.R.layout.simple_list_item_1,
-                            WebUI.values())
+                        it.adapter = ArrayAdapter(
+                            context, android.R.layout.simple_list_item_1,
+                            WebUI.entries.toTypedArray()
+                        )
                         runCatching {
                             it.setSelection(
-                                WebUI.values().toList().indexOf(
+                                WebUI.entries.indexOf(
                                     WebUI.valueOf(
                                         KV.getString("DB_NAME", "LOCAL")!!
                                     )
                                 )
                             )
                         }
-                        it.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
-                            override fun onItemSelected(adapter: AdapterView<*>, v: View,
-                                                        index: Int, id: Long
+                        it.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                            override fun onItemSelected(
+                                adapter: AdapterView<*>, v: View,
+                                index: Int, id: Long
                             ) {
                                 KV.putString("DB_NAME", (v as TextView).text.toString())
                                 if (v.text == WebUI.Other.name)
@@ -315,13 +340,16 @@ class MainPage : Fragment(), androidx.appcompat.widget.Toolbar.OnMenuItemClickLi
         val db = runCatching {
             WebUI.valueOf(KV.getString("DB_NAME", "LOCAL")!!).url
         }.getOrDefault("${ClashConfig.baseURL}/ui/")
-        bundle.putString("URL", db +
-                if ((context?.resources?.configuration?.uiMode
-                        ?.and(Configuration.UI_MODE_NIGHT_MASK)) == Configuration.UI_MODE_NIGHT_YES) {
-                    "?theme=dark"
-                }else{
-                    "?theme=light"
-                })
+        bundle.putString(
+            "URL", db +
+                    if ((context?.resources?.configuration?.uiMode
+                            ?.and(Configuration.UI_MODE_NIGHT_MASK)) == Configuration.UI_MODE_NIGHT_YES
+                    ) {
+                        "?theme=dark"
+                    } else {
+                        "?theme=light"
+                    }
+        )
         return bundle
     }
 }
