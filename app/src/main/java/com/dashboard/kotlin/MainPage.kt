@@ -197,7 +197,7 @@ class MainPage : Fragment(), androidx.appcompat.widget.Toolbar.OnMenuItemClickLi
 
                 binding.layoutButtons.run {
                     clashStatus.isClickable = status != ClashStatus.Status.CmdRunning
-                    if (status != ClashStatus.Status.Running) {
+                    if (status == ClashStatus.Status.Running) {
                         resourcesStatusText.visibility = View.VISIBLE
                         startStatusScope()
                     } else {
