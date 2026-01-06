@@ -3,12 +3,10 @@
 agp = "8.12.0"
 appcompat = "1.7.1"
 constraintlayout = "2.2.1"
-espressoCore = "3.7.0"
 gson = "2.13.2"
-junit = "4.13.2"
-junitVersion = "1.3.0"
 kotlin = "2.3.0"
-libsu = "5.0.0"
+libsu = "6.0.0"
+busybox = "5.0.0"
 material = "1.13.0"
 mmkv = "2.3.0"
 navigation = "2.9.6"
@@ -18,14 +16,11 @@ swiperefreshlayout = "1.2.0"
 [libraries]
 androidx-appcompat = {group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat"}
 androidx-constraintlayout = {group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout"}
-androidx-espresso-core = {group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore"}
-androidx-junit = {group = "androidx.test.ext", name = "junit", version.ref = "junitVersion"}
 androidx-navigation-fragment-ktx = {group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigation"}
 androidx-navigation-ui-ktx = {group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigation"}
 androidx-swiperefreshlayout = {group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout"}
 gson = {group = "com.google.code.gson", name = "gson", version.ref = "gson"}
-junit = {group = "junit", name = "junit", version.ref = "junit"}
-libsu-busybox = {group = "com.github.topjohnwu.libsu", name = "busybox", version.ref = "libsu"}
+libsu-busybox = {group = "com.github.topjohnwu.libsu", name = "busybox", version.ref = "busybox"}
 libsu-core = {group = "com.github.topjohnwu.libsu", name = "core", version.ref = "libsu"}
 material = {group = "com.google.android.material", name = "material", version.ref = "material"}
 mmkv-static = {group = "com.tencent", name = "mmkv-static", version.ref = "mmkv"}

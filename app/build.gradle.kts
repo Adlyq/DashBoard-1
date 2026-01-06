@@ -1,26 +1,24 @@
-import java.io.ByteArrayOutputStream
+@file:Suppress("UnstableApiUsage")
+
+import com.android.build.gradle.internal.api.BaseVariantOutputImpl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
 }
 
-fun runCommand(command: String): String {
-    return try {
-        val byteOut = ByteArrayOutputStream()
-        project.exec {
-            commandLine = command.split(" ")
-            standardOutput = byteOut
-        }
-        byteOut.toString().trim()
-    } catch (e: Exception) {
-        e.printStackTrace()
-        ""
-    }
-}
+val gitCommitCountProvider: Provider<Int> by extra(
+    providers.exec {
+        commandLine("git", "rev-list", "HEAD", "--count")
+    }.standardOutput.asText.map { it.trim().toIntOrNull() ?: 0 }
+)
 
-val gitCommitCount = runCommand("git rev-list HEAD --count").toIntOrNull() ?: 1
-val gitCommitHash = runCommand("git rev-parse --verify --short HEAD")
+val gitHashProvider: Provider<String> by extra(
+    providers.exec {
+        commandLine("git", "rev-parse", "--verify", "--short", "HEAD")
+    }.standardOutput.asText.map { it.trim() }
+)
 
 android {
     namespace = "com.dashboard.kotlin"
@@ -32,9 +30,9 @@ android {
         minSdk = 26
         //noinspection OldTargetApi
         targetSdk = 34
-        versionCode = gitCommitCount
+        versionCode = gitCommitCountProvider.get()
         versionName = "5.5"
-        versionNameSuffix = ".r${gitCommitCount}.${gitCommitHash}"
+        versionNameSuffix = ".r${gitCommitCountProvider.get()}.${gitHashProvider.get()}"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
@@ -49,7 +47,7 @@ android {
 
     applicationVariants.all {
         outputs.all {
-            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
+            (this as BaseVariantOutputImpl).outputFileName =
                 "${rootProject.name}-v${versionName}-${buildType.name}.apk"
         }
     }
@@ -70,7 +68,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlin.compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        jvmTarget.set(JvmTarget.JVM_17)
     }
     externalNativeBuild {
         cmake {
