@@ -13,8 +13,6 @@ class MApplication : Application() {
     companion object {
         lateinit var GExternalCacheDir: String
         lateinit var KV: MMKV
-
-        lateinit var rootConnection: RootConnection
     }
 
     init {
@@ -30,9 +28,5 @@ class MApplication : Application() {
         GExternalCacheDir = applicationContext.externalCacheDir.toString()
         MMKV.initialize(applicationContext)
         KV = MMKV.defaultMMKV(MMKV.MULTI_PROCESS_MODE, null)
-
-        rootConnection = RootConnection { applicationContext }
-        val intent = Intent(this, MRootService::class.java)
-        RootService.bind(intent, rootConnection)
     }
 }

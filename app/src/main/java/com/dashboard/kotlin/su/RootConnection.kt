@@ -8,19 +8,15 @@ import android.os.IBinder
 import com.topjohnwu.superuser.ipc.RootService
 
 
-class RootConnection(
-    val getContext: () -> Context
-) : ServiceConnection {
-    var binder: MRootService.RootBinder? = null
+class RootConnection : ServiceConnection {
+    var binder: IBinder? = null
 
 
     override fun onServiceConnected(name: ComponentName, service: IBinder) {
-        binder = service as? MRootService.RootBinder
+        binder = service
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
         binder = null
-
-        RootService.bind(Intent(getContext(), MRootService::class.java), this)
     }
 }

@@ -1,24 +1,20 @@
 package com.dashboard.kotlin
 
-import android.annotation.SuppressLint
+import android.content.Intent
 import android.text.Spanned
 import android.widget.ScrollView
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.lifecycleScope
 import com.dashboard.kotlin.clashhelper.ClashConfig
+import com.dashboard.kotlin.su.MRootService
+import com.dashboard.kotlin.su.RootConnection
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.ipc.RootService
+import com.topjohnwu.superuser.nio.FileSystemManager
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.ticker
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
 @DelicateCoroutinesApi
 class CmdLogPage : BaseLogPage() {
-    private val data = MutableStateFlow("")
-
     private var readLogJob: Job? = null
 
     override fun onResume() {
@@ -34,20 +30,77 @@ class CmdLogPage : BaseLogPage() {
         readLogJob = null
     }
 
-    @OptIn(ObsoleteCoroutinesApi::class)
     fun start() {
-        val clashV = Shell.cmd("${ClashConfig.corePath} -v").exec().out.first()
-        data.onEach {
-            binding.logCat.text = formatLog("$clashV\n${it}")
-            binding.scrollView.fullScroll(ScrollView.FOCUS_DOWN)
-        }.catch {
-            it.printStackTrace()
-        }.launchIn(lifecycleScope + Dispatchers.Main)
+        val rootConnection = RootConnection()
+        RootService.bind(Intent(context, MRootService::class.java), rootConnection);
+        readLogJob = lifecycleScope.launch(Dispatchers.IO) {
+            val clashV = Shell.cmd("${ClashConfig.corePath} -v").exec().out.firstOrNull() ?: ""
+            withContext(Dispatchers.Main) {
+                binding.logCat.text = clashV
+            }
 
+            // 等待 Binder 就绪
+            while (rootConnection.binder == null && isActive) {
+                delay(100)
+            }
+            if (!isActive) return@launch
 
-        readLogJob = ticker(500L, 0).consumeAsFlow().onEach {
+            val remoteFS = FileSystemManager.getRemote(rootConnection.binder!!)
+            val logFile = remoteFS.getFile(ClashConfig.logPath)
+            var offset = 0L
+            val leftovers = StringBuilder()
 
-        }.launchIn(lifecycleScope + Dispatchers.IO)
+            while (isActive) {
+                val length = logFile.length()
+                if (length < offset) {
+                    offset = 0
+                    leftovers.clear()
+                    withContext(Dispatchers.Main) {
+                        binding.logCat.text = formatLog("$clashV\n")
+                    }
+                }
+
+                if (length > offset) {
+                    val ips = logFile.newInputStream()
+                    ips.skip(offset)
+                    val buffer = ByteArray(8192)
+                    var read: Int
+                    val sb = StringBuilder()
+
+                    while (true) {
+                        read = ips.read(buffer)
+                        if (read <= 0) break
+                        sb.append(String(buffer, 0, read))
+                        offset += read
+                    }
+                    ips.close()
+
+                    val fullText = leftovers.toString() + sb.toString()
+                    leftovers.clear()
+
+                    val lastNewline = fullText.lastIndexOf('\n')
+                    if (lastNewline != -1) {
+                        val toProcess = fullText.substring(0, lastNewline + 1)
+                        if (lastNewline + 1 < fullText.length) {
+                            leftovers.append(fullText.substring(lastNewline + 1))
+                        }
+
+                        if (toProcess.isNotEmpty()) {
+                            val sp = formatLog(toProcess.trimEnd('\n'))
+                            withContext(Dispatchers.Main) {
+                                binding.logCat.append(sp)
+                                binding.scrollView.post {
+                                    binding.scrollView.fullScroll(ScrollView.FOCUS_DOWN)
+                                }
+                            }
+                        }
+                    } else {
+                        leftovers.append(fullText)
+                    }
+                }
+                delay(500)
+            }
+        }
     }
 
     companion object {
@@ -69,9 +122,7 @@ class CmdLogPage : BaseLogPage() {
 
                 rl.groupValues.let {
                     rstr.append(
-                        "<span style='color:#fb923c'>${it[1]}</span>" +
-                                "<span style='color:${levelToColor[it[2]]}'><strong>${it[2]}</strong></span>" +
-                                "<span> ${it[3]}</span><br/>"
+                        "<span style='color:#fb923c'>${it[1]}</span>" + "<span style='color:${levelToColor[it[2]]}'><strong>${it[2]}</strong></span>" + "<span> ${it[3]}</span><br/>"
                     )
                 }
 
