@@ -40,12 +40,6 @@ class MainPage : Fragment(), androidx.appcompat.widget.Toolbar.OnMenuItemClickLi
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        if (KV.getBoolean("TailLongClick", false)) {
-            runCatching {
-                findNavController()
-                    .navigate(R.id.action_mainPage_to_webViewPage_withoutBackStack, getWebViewBundle())
-            }
-        }
         _binding = FragmentMainPageBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -109,7 +103,7 @@ class MainPage : Fragment(), androidx.appcompat.widget.Toolbar.OnMenuItemClickLi
             menuWebDashboard.setOnClickListener {
                 runCatching {
                     it.findNavController()
-                        .navigate(R.id.action_mainPage_to_webViewPage, getWebViewBundle())
+                        .navigate(R.id.action_mainPage_to_webViewPage, WebViewPage.getWebViewBundle(requireContext()))
                 }
             }
 
@@ -331,22 +325,4 @@ class MainPage : Fragment(), androidx.appcompat.widget.Toolbar.OnMenuItemClickLi
         return true
     }
 
-    private fun getWebViewBundle(): Bundle {
-        val bundle = Bundle()
-
-        val db = runCatching {
-            WebUI.valueOf(KV.getString("DB_NAME", "LOCAL")!!).url
-        }.getOrDefault("${ClashConfig.baseURL}/ui/")
-        bundle.putString(
-            "URL", db +
-                    if ((context?.resources?.configuration?.uiMode
-                            ?.and(Configuration.UI_MODE_NIGHT_MASK)) == Configuration.UI_MODE_NIGHT_YES
-                    ) {
-                        "?theme=dark"
-                    } else {
-                        "?theme=light"
-                    }
-        )
-        return bundle
-    }
 }

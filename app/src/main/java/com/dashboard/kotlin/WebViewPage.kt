@@ -2,6 +2,7 @@ package com.dashboard.kotlin
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
@@ -19,6 +20,9 @@ import android.webkit.WebViewClient
 import androidx.activity.result.contract.ActivityResultContracts
 import com.dashboard.kotlin.databinding.FragmentWebviewPageBinding
 import androidx.core.net.toUri
+import com.dashboard.kotlin.MApplication.Companion.KV
+import com.dashboard.kotlin.clashhelper.ClashConfig
+import com.dashboard.kotlin.clashhelper.WebUI
 
 
 class WebViewPage : Fragment() {
@@ -132,5 +136,27 @@ class WebViewPage : Fragment() {
         _binding = null
         Log.d("Destroy", "WebViewPageDestroyView")
 
+    }
+
+
+    companion object {
+        fun getWebViewBundle(context: Context): Bundle {
+            val bundle = Bundle()
+
+            val db = runCatching {
+                WebUI.valueOf(KV.getString("DB_NAME", "LOCAL")!!).url
+            }.getOrDefault("${ClashConfig.baseURL}/ui/")
+            bundle.putString(
+                "URL", db +
+                        if ((context.resources?.configuration?.uiMode
+                                ?.and(Configuration.UI_MODE_NIGHT_MASK)) == Configuration.UI_MODE_NIGHT_YES
+                        ) {
+                            "?theme=dark"
+                        } else {
+                            "?theme=light"
+                        }
+            )
+            return bundle
+        }
     }
 }
