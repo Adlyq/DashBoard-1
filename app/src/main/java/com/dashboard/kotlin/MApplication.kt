@@ -1,23 +1,28 @@
 package com.dashboard.kotlin
 
 import android.app.Application
-import android.util.Log
+import android.content.Intent
+import com.dashboard.kotlin.su.MRootService
+import com.dashboard.kotlin.su.RootConnection
 import com.tencent.mmkv.MMKV
-import com.topjohnwu.superuser.BusyBoxInstaller
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.ipc.RootService
+
 
 class MApplication : Application() {
     companion object {
         lateinit var GExternalCacheDir: String
         lateinit var KV: MMKV
+
+        lateinit var rootConnection: RootConnection
     }
 
     init {
         Shell.setDefaultBuilder(
             Shell.Builder.create()
-                .setFlags(Shell.FLAG_REDIRECT_STDERR)
                 .setInitializers(Shell.Initializer::class.java)
         )
+        Shell.enableLegacyStderrRedirection = true
     }
 
     override fun onCreate() {
@@ -25,5 +30,9 @@ class MApplication : Application() {
         GExternalCacheDir = applicationContext.externalCacheDir.toString()
         MMKV.initialize(applicationContext)
         KV = MMKV.defaultMMKV(MMKV.MULTI_PROCESS_MODE, null)
+
+        rootConnection = RootConnection { applicationContext }
+        val intent = Intent(this, MRootService::class.java)
+        RootService.bind(intent, rootConnection)
     }
 }

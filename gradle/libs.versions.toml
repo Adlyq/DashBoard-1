@@ -22,9 +22,14 @@ androidx-swiperefreshlayout = {group = "androidx.swiperefreshlayout", name = "sw
 gson = {group = "com.google.code.gson", name = "gson", version.ref = "gson"}
 libsu-busybox = {group = "com.github.topjohnwu.libsu", name = "busybox", version.ref = "busybox"}
 libsu-core = {group = "com.github.topjohnwu.libsu", name = "core", version.ref = "libsu"}
+libsu-service = {group = "com.github.topjohnwu.libsu", name = "service", version.ref = "libsu"}
+libsu-nio = {group = "com.github.topjohnwu.libsu", name = "nio", version.ref = "libsu"}
 material = {group = "com.google.android.material", name = "material", version.ref = "material"}
 mmkv-static = {group = "com.tencent", name = "mmkv-static", version.ref = "mmkv"}
 okhttp = {group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp"}
+
+[bundles]
+libsu = ["libsu-core", "libsu-service", "libsu-nio", "libsu-busybox"]
 
 [plugins]
 android-application = {id = "com.android.application", version.ref = "agp"}

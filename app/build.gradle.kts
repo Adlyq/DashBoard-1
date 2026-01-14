@@ -95,6 +95,5 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.gson)
 
-    implementation(libs.libsu.core)
-    implementation(libs.libsu.busybox)
+    implementation(libs.bundles.libsu)
 }

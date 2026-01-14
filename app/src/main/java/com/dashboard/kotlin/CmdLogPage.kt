@@ -1,74 +1,53 @@
 package com.dashboard.kotlin
 
 import android.annotation.SuppressLint
-import android.text.Html
 import android.text.Spanned
 import android.widget.ScrollView
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.lifecycleScope
 import com.dashboard.kotlin.clashhelper.ClashConfig
-import com.dashboard.kotlin.clashhelper.ClashStatus
-import com.topjohnwu.superuser.BusyBoxInstaller
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.ticker
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @DelicateCoroutinesApi
 class CmdLogPage : BaseLogPage() {
-    private val job = Shell.Builder.create()
-        .setInitializers(Shell.Initializer::class.java)
-        .build()
-        .newJob().add("cat ${ClashConfig.logPath}")
-    var flag = false
+    private val data = MutableStateFlow("")
+
+    private var readLogJob: Job? = null
 
     override fun onResume() {
         super.onResume()
+        readLogJob?.cancel()
+        readLogJob = null
         start()
     }
 
     override fun onPause() {
         super.onPause()
-        readLogScope?.cancel()
+        readLogJob?.cancel()
+        readLogJob = null
     }
 
-    var readLogScope: Job? = null
+    @OptIn(ObsoleteCoroutinesApi::class)
+    fun start() {
+        val clashV = Shell.cmd("${ClashConfig.corePath} -v").exec().out.first()
+        data.onEach {
+            binding.logCat.text = formatLog("$clashV\n${it}")
+            binding.scrollView.fullScroll(ScrollView.FOCUS_DOWN)
+        }.catch {
+            it.printStackTrace()
+        }.launchIn(lifecycleScope + Dispatchers.Main)
 
-    @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
-    fun start(){
-        if (readLogScope?.isActive == true) return
-        binding.logCat.setOnTouchListener { v, _ ->
-            flag = true
-            v.performClick()
-            false
-        }
-        readLogScope = lifecycleScope.launch(Dispatchers.IO) {
-            val clashV = Shell.cmd("${ClashConfig.corePath} -v").exec().out.first()
-            withContext(Dispatchers.Main){
-                binding.logCat.text = formatLog("$clashV\n${readLog()}")
-            }
-            while (true){
-                if (ClashStatus.isCmdRunning){
-                    flag = false
-                    delay(200)
-                } else {
-                    delay(1000)
-                }
-                if (flag) continue
-                withContext(Dispatchers.Main){
-                    runCatching {
-                        binding.logCat.text = formatLog("$clashV\n${readLog()}")
-                        binding.scrollView.fullScroll(ScrollView.FOCUS_DOWN)
-                    }
-                }
-            }
-        }
-    }
 
-    private suspend fun readLog(): String{
-        val lst = mutableListOf<String>()
-        withContext(Dispatchers.IO) {
-            job.to(lst).exec()
-        }
-        return lst.joinToString("\n")
+        readLogJob = ticker(500L, 0).consumeAsFlow().onEach {
+
+        }.launchIn(lifecycleScope + Dispatchers.IO)
     }
 
     companion object {
@@ -89,9 +68,11 @@ class CmdLogPage : BaseLogPage() {
                 }
 
                 rl.groupValues.let {
-                    rstr.append("<span style='color:#fb923c'>${it[1]}</span>" +
-                            "<span style='color:${levelToColor[it[2]]}'><strong>${it[2]}</strong></span>" +
-                            "<span> ${it[3]}</span><br/>")
+                    rstr.append(
+                        "<span style='color:#fb923c'>${it[1]}</span>" +
+                                "<span style='color:${levelToColor[it[2]]}'><strong>${it[2]}</strong></span>" +
+                                "<span> ${it[3]}</span><br/>"
+                    )
                 }
 
             }
