@@ -39,6 +39,7 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action android:id="@+id/action_mainPage_to_noRootFragment" app:destination="@id/noRootFragment"/>
     </fragment>
     <fragment
         android:id="@+id/webViewPage"
@@ -56,4 +57,11 @@
         android:name="com.dashboard.kotlin.SpeedTestPage"
         android:label="fragment_speed_test_page"
         tools:layout="@layout/fragment_speed_test_page" />
+    <fragment
+        android:id="@+id/noRootFragment"
+        android:name="com.dashboard.kotlin.NoRootFragment"
+        android:label="fragment_no_root"
+        tools:layout="@layout/fragment_no_root" >
+        <action android:id="@+id/action_noRootFragment_to_mainPage" app:destination="@id/mainPage"/>
+    </fragment>
 </navigation>

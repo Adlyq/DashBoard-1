@@ -27,7 +27,7 @@ android {
 
     defaultConfig {
         applicationId = "com.dashboard.kotlin"
-        minSdk = 30
+        minSdk = 33
         //noinspection OldTargetApi
         targetSdk = 34
         versionCode = gitCommitCountProvider.get()
